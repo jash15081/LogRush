@@ -51,7 +51,7 @@ async function sendBatch(batch) {
     }
   } catch (err) {
     stats.failedRequests++;
-    console.error("POST failed:", err.message || err);
+    console.error("POST failed:", err);
   }
 }
 
