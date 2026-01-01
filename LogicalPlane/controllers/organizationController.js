@@ -72,3 +72,35 @@ export async function createOrganization(req, res) {
   }
 }
 
+export async function deleteOrganization(req, res) {
+  const { organizationId } = req.body;
+  if (!organizationId) {
+    return res.status(400).json({
+      error: "organizationId is required",
+    });
+  }
+  try {
+    const result = await pool.query(
+      `
+        DELETE FROM organizations
+        WHERE id = $1
+        RETURNING id
+      `,
+      [organizationId]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({
+        error: "Organization not found",
+      });
+    }
+    return res.status(200).json({
+      message: "Organization deleted successfully",
+    });
+  }
+  catch (err) {
+    console.error("Delete organization error:", err);
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+}

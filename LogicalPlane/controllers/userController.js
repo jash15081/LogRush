@@ -111,3 +111,78 @@ export async function createUser(req, res) {
         });
     }
 }
+
+export async function deleteUser(req, res) {
+    const { userId } = req.body;
+    const { organizationId } = req.user;
+
+    if (!userId) {
+        return res.status(400).json({ error: "userId is required" });
+    }
+
+    const client = await pool.connect();
+
+    try {
+        await client.query("BEGIN");
+
+        // 1️⃣ Get user role
+        const userRes = await client.query(
+            `
+            SELECT role
+            FROM users
+            WHERE id = $1 AND organization_id = $2
+            `,
+            [userId, organizationId]
+        );
+
+        if (userRes.rowCount === 0) {
+            await client.query("ROLLBACK");
+            return res.status(404).json({
+                error: "User not found or does not belong to your organization",
+            });
+        }
+
+        const { role } = userRes.rows[0];
+
+        // 2️⃣ If admin, ensure at least one admin remains
+        if (role === "admin") {
+            const adminCountRes = await client.query(
+                `
+                SELECT COUNT(*)::int AS count
+                FROM users
+                WHERE organization_id = $1 AND role = 'admin'
+                `,
+                [organizationId]
+            );
+
+            if (adminCountRes.rows[0].count <= 1) {
+                await client.query("ROLLBACK");
+                return res.status(400).json({
+                    error: "Organization must have at least one admin",
+                });
+            }
+        }
+
+        // 3️⃣ Delete user
+        await client.query(
+            `
+            DELETE FROM users
+            WHERE id = $1 AND organization_id = $2
+            `,
+            [userId, organizationId]
+        );
+
+        await client.query("COMMIT");
+
+        return res.json({ message: "User deleted successfully" });
+
+    } catch (err) {
+        await client.query("ROLLBACK");
+        console.error(err);
+        return res.status(500).json({ error: "Internal server error" });
+    } finally {
+        client.release();
+    }
+}
+
+

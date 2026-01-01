@@ -1,12 +1,11 @@
 import express from 'express';
 import pool from '../config/db.js';
-import { createOrganization } from '../controllers/organizationController.js';
+import { createOrganization,deleteOrganization } from '../controllers/organizationController.js';
+import { authAdmin } from '../middlewares/auth.js';
 const organizationRouter = express.Router();
 
-// Define organization-related routes here
-organizationRouter.get('/', async (req, res) => {
-   
-});
-organizationRouter.post('/', createOrganization);
+
+organizationRouter.post('/create', createOrganization);
+organizationRouter.delete('/delete', authAdmin,deleteOrganization);
 
 export default organizationRouter;
