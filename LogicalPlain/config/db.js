@@ -1,7 +1,7 @@
 import {Pool} from 'pg';
 
 
-console.log('Database Config Loaded',process.env.DATABASE_PASSWORD);
+
 const pool = new Pool({
     user: process.env.DATABASE_USERNAME,
     host: 'localhost',

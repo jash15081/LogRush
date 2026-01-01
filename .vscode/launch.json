@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Ingestion API",
+      "runtimeExecutable": "node",
+      "program": "${workspaceFolder}/DataPlain/injestion-service/src/server.js",
+      "envFile": "${workspaceFolder}/DataPlain/injestion-service/.env",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}
