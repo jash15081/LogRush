@@ -1,0 +1,20 @@
+{
+  "name": "log-hot-indexer",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon ./src/app.js"
+  },
+  "dependencies": {
+    "@opensearch-project/opensearch": "^3.5.1",
+    "archiver": "^7.0.1",
+    "kafkajs": "^2.2.4",
+    "nodemon": "^3.1.11"
+  },
+  "keywords": []
+}

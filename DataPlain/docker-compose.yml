@@ -1,0 +1,90 @@
+version: "3.8"
+
+services:
+  redpanda:
+    image: redpandadata/redpanda:v23.3.3
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp
+      - "1"
+      - --memory
+      - "1G"
+      - --reserve-memory
+      - "0M"
+      - --node-id
+      - "0"
+      - --check=false
+      - --kafka-addr
+      - INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9092
+      - --advertise-kafka-addr
+      - INTERNAL://redpanda:29092,EXTERNAL://localhost:9092
+
+    ports:
+      - "9092:9092"
+
+  console:
+    image: docker.redpanda.com/redpandadata/console:latest
+    environment:
+      KAFKA_BROKERS: redpanda:29092
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redpanda
+
+  topic-init:
+    image: redpandadata/redpanda:v23.3.3
+    depends_on:
+      - redpanda
+    entrypoint: >
+      bash -c "
+      echo 'Waiting for Redpanda...' &&
+      until rpk cluster info --brokers redpanda:29092; do sleep 2; done &&
+
+      echo 'Creating topic if it does not exist...' &&
+      rpk topic create logs.raw --partitions 6 --replicas 1 --brokers redpanda:29092 || true &&
+
+      echo 'Ensuring topic has enough partitions...' &&
+      rpk topic add-partitions logs.raw --num 5 --brokers redpanda:29092 || true
+      "
+  nginx:
+    image: nginx:latest
+    ports:
+      - "4100:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - ingestion-service
+
+  opensearch:
+    image: opensearchproject/opensearch:2.12.0
+    environment:
+      - discovery.type=single-node
+      - plugins.security.disabled=true
+      - bootstrap.memory_lock=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Jash_1508
+    ports:
+      - "9200:9200"
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  ingestion-service:
+    build: ./ingestion-service
+    env_file:
+      - .env.ingestion
+    depends_on:
+      - redpanda
+      - redis
+      - topic-init
+  log-hot-indexer:
+    build: ./log-hot-indexer
+    depends_on:
+      - redpanda
+      - opensearch
+      - redis
+      - topic-init

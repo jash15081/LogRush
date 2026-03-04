@@ -1,10 +1,3 @@
-/**
- * Log Generator
- * -------------
- * Simulates realistic multi-tenant log traffic.
- * Supports per–API-key RPS control.
- */
-
 import fetch from "node-fetch";
 import crypto from "crypto";
 
@@ -12,12 +5,8 @@ import {
   INGESTION_URL,
   ORGANIZATIONS,
   LOG_MESSAGES,
-  TRAFFIC_CONFIG
+  TRAFFIC_CONFIG,
 } from "./config.js";
-
-/* =========================
-   UTILITY FUNCTIONS
-   ========================= */
 
 function randomChoice(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -30,10 +19,6 @@ function nowISO() {
 function generateTraceId() {
   return crypto.randomBytes(8).toString("hex");
 }
-
-/* =========================
-   LOG GENERATION
-   ========================= */
 
 function pickLogLevel() {
   const r = Math.random();
@@ -53,8 +38,8 @@ function generateLog(traceId) {
     metadata: {
       latency_ms: Math.floor(Math.random() * 400),
       user_id: `user_${Math.floor(Math.random() * 1000)}`,
-      request_id: crypto.randomUUID()
-    }
+      request_id: crypto.randomUUID(),
+    },
   };
 }
 
@@ -69,10 +54,6 @@ function generateLogBatch(batchSize) {
   return logs;
 }
 
-/* =========================
-   REQUEST BUILDER
-   ========================= */
-
 function buildRequest(org, apiKey) {
   const application = randomChoice(org.applications);
   const environment = randomChoice(org.environments);
@@ -84,14 +65,10 @@ function buildRequest(org, apiKey) {
       environment,
       host: `${application}-${environment}-01`,
       version: "1.0.0",
-      logs: generateLogBatch(TRAFFIC_CONFIG.BATCH_SIZE)
-    }
+      logs: generateLogBatch(TRAFFIC_CONFIG.BATCH_SIZE),
+    },
   };
 }
-
-/* =========================
-   SEND LOGS
-   ========================= */
 
 async function sendLogs(org, apiKey) {
   const { payload } = buildRequest(org, apiKey);
@@ -101,24 +78,20 @@ async function sendLogs(org, apiKey) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
+        Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
 
     console.log(
       `[${org.name}] key=${apiKey.slice(0, 6)}… | ` +
-      `${payload.application} (${payload.environment}) | ` +
-      `batch=${payload.logs.length} | status=${res.status}`
+        `${payload.application} (${payload.environment}) | ` +
+        `batch=${payload.logs.length} | status=${res.status}`,
     );
   } catch (err) {
     console.error("Failed to send logs:", err.message);
   }
 }
-
-/* =========================
-   PER-API-KEY TRAFFIC LOOPS
-   ========================= */
 
 function startApiKeyTraffic(org, apiKeyConfig) {
   const { key, rps } = apiKeyConfig;
@@ -126,17 +99,13 @@ function startApiKeyTraffic(org, apiKeyConfig) {
   const intervalMs = Math.max(1, Math.floor(1000 / rps));
 
   console.log(
-    `▶ Starting traffic | org=${org.name} | key=${key.slice(0, 6)}… | ${rps} RPS`
+    `▶ Starting traffic | org=${org.name} | key=${key.slice(0, 6)}… | ${rps} RPS`,
   );
 
   setInterval(() => {
     sendLogs(org, key);
   }, intervalMs);
 }
-
-/* =========================
-   START GENERATOR
-   ========================= */
 
 console.log("🚀 Log generator started");
 console.log(`➡️  Ingestion URL: ${INGESTION_URL}`);
