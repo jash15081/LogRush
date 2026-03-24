@@ -1,0 +1,2964 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Logical Plane</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0a0a0b;
+        --bg2: #111114;
+        --bg3: #18181c;
+        --bg4: #1e1e24;
+        --border: #2a2a32;
+        --border2: #3a3a44;
+        --text: #e8e8f0;
+        --text2: #9090a8;
+        --text3: #5a5a72;
+        --accent: #7c6dfa;
+        --accent2: #5a4de8;
+        --accent-dim: rgba(124, 109, 250, 0.12);
+        --green: #3ddc97;
+        --green-dim: rgba(61, 220, 151, 0.12);
+        --red: #f06060;
+        --red-dim: rgba(240, 96, 96, 0.12);
+        --yellow: #f0c060;
+        --yellow-dim: rgba(240, 192, 96, 0.1);
+        --blue: #60a0f0;
+        --r: 6px;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body,
+      #root {
+        height: 100%;
+        background: var(--bg);
+        color: var(--text);
+        font-family: "DM Mono", monospace;
+        font-size: 13px;
+      }
+      ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg2);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border2);
+        border-radius: 2px;
+      }
+
+      /* Layout */
+      .app-shell {
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+      }
+      .sidebar {
+        width: 220px;
+        min-width: 220px;
+        background: var(--bg2);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+      }
+      .sidebar-logo {
+        padding: 24px 20px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .logo-mark {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 17px;
+        letter-spacing: -0.5px;
+        color: var(--text);
+      }
+      .logo-sub {
+        font-size: 10px;
+        color: var(--text3);
+        margin-top: 2px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+      .sidebar-nav {
+        flex: 1;
+        padding: 16px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        overflow-y: auto;
+      }
+      .nav-section {
+        font-size: 9px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text3);
+        padding: 12px 10px 6px;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: var(--r);
+        cursor: pointer;
+        color: var(--text2);
+        transition: all 0.15s;
+        text-decoration: none;
+        font-size: 12px;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+      }
+      .nav-item:hover {
+        background: var(--bg3);
+        color: var(--text);
+      }
+      .nav-item.active {
+        background: var(--accent-dim);
+        color: var(--accent);
+      }
+      .nav-item svg {
+        flex-shrink: 0;
+        opacity: 0.7;
+      }
+      .nav-item.active svg {
+        opacity: 1;
+      }
+      .sidebar-footer {
+        padding: 14px 10px;
+        border-top: 1px solid var(--border);
+      }
+      .org-badge {
+        padding: 8px 10px;
+        background: var(--bg3);
+        border-radius: var(--r);
+        cursor: pointer;
+      }
+      .org-name {
+        font-size: 11px;
+        color: var(--text);
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .org-role {
+        font-size: 10px;
+        color: var(--accent);
+        margin-top: 2px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background: var(--bg);
+      }
+      .topbar {
+        height: 52px;
+        min-height: 52px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        padding: 0 28px;
+        gap: 16px;
+        background: var(--bg);
+      }
+      .topbar-title {
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 15px;
+        flex: 1;
+      }
+      .page-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 28px;
+      }
+
+      /* Cards */
+      .card {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        padding: 20px;
+      }
+      .card-sm {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        padding: 14px 16px;
+      }
+      .card-title {
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 13px;
+        margin-bottom: 14px;
+        color: var(--text);
+      }
+
+      /* Grid */
+      .grid2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .grid3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 16px;
+      }
+
+      /* Stat */
+      .stat-card {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        padding: 20px;
+      }
+      .stat-val {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 28px;
+        color: var(--text);
+        margin-bottom: 4px;
+      }
+      .stat-label {
+        font-size: 11px;
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* Buttons */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 14px;
+        border-radius: var(--r);
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+        cursor: pointer;
+        border: none;
+        transition: all 0.15s;
+        font-weight: 500;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: var(--accent2);
+      }
+      .btn-ghost {
+        background: transparent;
+        color: var(--text2);
+        border: 1px solid var(--border);
+      }
+      .btn-ghost:hover {
+        background: var(--bg3);
+        color: var(--text);
+        border-color: var(--border2);
+      }
+      .btn-danger {
+        background: var(--red-dim);
+        color: var(--red);
+        border: 1px solid transparent;
+      }
+      .btn-danger:hover {
+        background: var(--red);
+        color: #fff;
+      }
+      .btn-green {
+        background: var(--green-dim);
+        color: var(--green);
+        border: 1px solid transparent;
+      }
+      .btn-green:hover {
+        background: var(--green);
+        color: #0a0a0b;
+      }
+      .btn-sm {
+        padding: 5px 10px;
+        font-size: 11px;
+      }
+      .btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      /* Forms */
+      .form-group {
+        margin-bottom: 16px;
+      }
+      .form-label {
+        font-size: 11px;
+        color: var(--text2);
+        margin-bottom: 6px;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .form-input {
+        width: 100%;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        padding: 9px 12px;
+        color: var(--text);
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+        outline: none;
+        transition: border-color 0.15s;
+      }
+      .form-input:focus {
+        border-color: var(--accent);
+      }
+      .form-input::placeholder {
+        color: var(--text3);
+      }
+      .form-select {
+        width: 100%;
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        padding: 9px 12px;
+        color: var(--text);
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+        outline: none;
+        cursor: pointer;
+        appearance: none;
+      }
+      .form-select:focus {
+        border-color: var(--accent);
+      }
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+
+      /* Table */
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th {
+        text-align: left;
+        font-size: 10px;
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 8px 14px;
+        border-bottom: 1px solid var(--border);
+        font-weight: 500;
+      }
+      td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+        color: var(--text2);
+        vertical-align: middle;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: var(--bg3);
+        color: var(--text);
+      }
+      .td-name {
+        color: var(--text);
+        font-weight: 500;
+      }
+
+      /* Badges */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 8px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+      }
+      .badge-admin {
+        background: var(--accent-dim);
+        color: var(--accent);
+      }
+      .badge-user {
+        background: var(--bg3);
+        color: var(--text3);
+      }
+      .badge-prod {
+        background: var(--green-dim);
+        color: var(--green);
+      }
+      .badge-staging {
+        background: var(--yellow-dim);
+        color: var(--yellow);
+      }
+      .badge-dev {
+        background: rgba(96, 160, 240, 0.1);
+        color: var(--blue);
+      }
+      .badge-test {
+        background: var(--bg3);
+        color: var(--text3);
+      }
+
+      /* Auth pages */
+      .auth-shell {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg);
+        position: relative;
+        overflow: hidden;
+      }
+      .auth-bg {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 60% 50% at 50% 0%,
+          rgba(124, 109, 250, 0.08) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .auth-card {
+        width: 380px;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 36px;
+        position: relative;
+        z-index: 1;
+      }
+      .auth-logo {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 20px;
+        margin-bottom: 6px;
+      }
+      .auth-sub {
+        font-size: 11px;
+        color: var(--text3);
+        margin-bottom: 28px;
+      }
+      .auth-switch {
+        text-align: center;
+        margin-top: 18px;
+        font-size: 11px;
+        color: var(--text3);
+      }
+      .auth-switch a {
+        color: var(--accent);
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .auth-switch a:hover {
+        text-decoration: underline;
+      }
+
+      /* Modal */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        backdrop-filter: blur(4px);
+      }
+      .modal {
+        background: var(--bg2);
+        border: 1px solid var(--border2);
+        border-radius: 10px;
+        padding: 28px;
+        width: 460px;
+        max-width: 95vw;
+        animation: slideUp 0.2s ease;
+      }
+      .modal-title {
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 15px;
+        margin-bottom: 6px;
+      }
+      .modal-sub {
+        font-size: 11px;
+        color: var(--text3);
+        margin-bottom: 20px;
+      }
+      .modal-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 20px;
+      }
+      @keyframes slideUp {
+        from {
+          transform: translateY(10px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      /* Toast */
+      .toast-wrap {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 2000;
+      }
+      .toast {
+        padding: 11px 16px;
+        border-radius: var(--r);
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 240px;
+        animation: toastIn 0.2s ease;
+        border: 1px solid;
+      }
+      .toast-success {
+        background: var(--green-dim);
+        color: var(--green);
+        border-color: rgba(61, 220, 151, 0.25);
+      }
+      .toast-error {
+        background: var(--red-dim);
+        color: var(--red);
+        border-color: rgba(240, 96, 96, 0.25);
+      }
+      .toast-info {
+        background: var(--accent-dim);
+        color: var(--accent);
+        border-color: rgba(124, 109, 250, 0.25);
+      }
+      @keyframes toastIn {
+        from {
+          transform: translateX(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      /* Key display */
+      .key-box {
+        background: var(--bg3);
+        border: 1px solid var(--border2);
+        border-radius: var(--r);
+        padding: 12px 14px;
+        font-size: 11px;
+        color: var(--green);
+        word-break: break-all;
+        line-height: 1.7;
+        position: relative;
+      }
+      .copy-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+      }
+
+      /* Warning box */
+      .warn-box {
+        background: rgba(240, 192, 96, 0.08);
+        border: 1px solid rgba(240, 192, 96, 0.2);
+        border-radius: var(--r);
+        padding: 11px 14px;
+        font-size: 11px;
+        color: var(--yellow);
+        line-height: 1.6;
+        margin-bottom: 14px;
+      }
+
+      /* Empty state */
+      .empty {
+        text-align: center;
+        padding: 48px 24px;
+        color: var(--text3);
+      }
+      .empty-icon {
+        font-size: 28px;
+        margin-bottom: 12px;
+        opacity: 0.4;
+      }
+      .empty-text {
+        font-size: 12px;
+        margin-bottom: 16px;
+      }
+
+      /* Section header */
+      .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+      }
+      .section-title {
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 15px;
+      }
+      .section-sub {
+        font-size: 11px;
+        color: var(--text3);
+        margin-top: 2px;
+      }
+
+      /* App row expandable */
+      .app-row {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        margin-bottom: 10px;
+        overflow: hidden;
+        transition: border-color 0.15s;
+      }
+      .app-row:hover {
+        border-color: var(--border2);
+      }
+      .app-row-header {
+        display: flex;
+        align-items: center;
+        padding: 14px 18px;
+        cursor: pointer;
+        gap: 14px;
+      }
+      .app-row-name {
+        font-weight: 500;
+        color: var(--text);
+        flex: 1;
+        font-size: 13px;
+      }
+      .app-row-desc {
+        font-size: 11px;
+        color: var(--text3);
+        margin-top: 2px;
+      }
+      .app-row-body {
+        border-top: 1px solid var(--border);
+        padding: 16px 18px;
+        background: var(--bg);
+      }
+      .chevron {
+        transition: transform 0.2s;
+        color: var(--text3);
+      }
+      .chevron.open {
+        transform: rotate(90deg);
+      }
+
+      /* Env pills */
+      .env-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+      .env-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        border: 1px solid var(--border);
+        background: var(--bg2);
+      }
+      .env-pill-name {
+        font-weight: 500;
+      }
+
+      /* Log table */
+      .log-level-error {
+        color: var(--red);
+      }
+      .log-level-warn {
+        color: var(--yellow);
+      }
+      .log-level-info {
+        color: var(--green);
+      }
+
+      /* Divider */
+      .divider {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 20px 0;
+      }
+
+      /* Loading spinner */
+      .spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid var(--border2);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+        display: inline-block;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .page-fade {
+        animation: pageFade 0.2s ease;
+      }
+      @keyframes pageFade {
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Confirm modal */
+      .confirm-text {
+        font-size: 12px;
+        color: var(--text2);
+        line-height: 1.7;
+        margin-bottom: 18px;
+      }
+      .danger-input {
+        border-color: var(--red) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+
+    <script type="text/babel">
+      const {
+        useState,
+        useEffect,
+        useContext,
+        createContext,
+        useCallback,
+        useRef,
+      } = React;
+
+      const BASE = "http://localhost:3000";
+
+      // ─── API ──────────────────────────────────────────────────────────────────────
+      async function api(method, path, body) {
+        const opts = {
+          method,
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        };
+        if (body) opts.body = JSON.stringify(body);
+        const res = await fetch(BASE + path, opts);
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok)
+          throw { status: res.status, message: data.error || "Request failed" };
+        return data;
+      }
+
+      // ─── Auth Context ─────────────────────────────────────────────────────────────
+      const AuthCtx = createContext(null);
+      function useAuth() {
+        return useContext(AuthCtx);
+      }
+
+      // ─── Toast Context ────────────────────────────────────────────────────────────
+      const ToastCtx = createContext(null);
+      function useToast() {
+        return useContext(ToastCtx);
+      }
+
+      function ToastProvider({ children }) {
+        const [toasts, setToasts] = useState([]);
+        const add = useCallback((msg, type = "info") => {
+          const id = Date.now();
+          setToasts((t) => [...t, { id, msg, type }]);
+          setTimeout(
+            () => setToasts((t) => t.filter((x) => x.id !== id)),
+            3500,
+          );
+        }, []);
+        return (
+          <ToastCtx.Provider value={add}>
+            {children}
+            <div className="toast-wrap">
+              {toasts.map((t) => (
+                <div key={t.id} className={`toast toast-${t.type}`}>
+                  <span>
+                    {t.type === "success"
+                      ? "✓"
+                      : t.type === "error"
+                        ? "✕"
+                        : "·"}
+                  </span>
+                  {t.msg}
+                </div>
+              ))}
+            </div>
+          </ToastCtx.Provider>
+        );
+      }
+
+      // ─── Router (hash-based) ──────────────────────────────────────────────────────
+      function useRoute() {
+        const [path, setPath] = useState(
+          window.location.hash.slice(1) || "/login",
+        );
+        useEffect(() => {
+          const h = () => setPath(window.location.hash.slice(1) || "/login");
+          window.addEventListener("hashchange", h);
+          return () => window.removeEventListener("hashchange", h);
+        }, []);
+        const navigate = (to) => {
+          window.location.hash = to;
+        };
+        return { path, navigate };
+      }
+
+      // ─── Icons ────────────────────────────────────────────────────────────────────
+      const Icon = {
+        dashboard: (
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+          </svg>
+        ),
+        apps: (
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+          </svg>
+        ),
+        keys: (
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <circle cx="7.5" cy="15.5" r="5.5" />
+            <path d="M21 2l-9.6 9.6M15.5 7.5L19 4" />
+          </svg>
+        ),
+        users: (
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+        ),
+        logs: (
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14,2 14,8 20,8" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+            <polyline points="10,9 9,9 8,9" />
+          </svg>
+        ),
+        settings: (
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2" />
+          </svg>
+        ),
+        logout: (
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16,17 21,12 16,7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+        ),
+        plus: (
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+          >
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        ),
+        trash: (
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          </svg>
+        ),
+        copy: (
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <rect x="9" y="9" width="13" height="13" rx="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </svg>
+        ),
+        chevron: (
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        ),
+        eye: (
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+        ),
+        eyeOff: (
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+            <line x1="1" y1="1" x2="23" y2="23" />
+          </svg>
+        ),
+      };
+
+      // ─── Modal ────────────────────────────────────────────────────────────────────
+      function Modal({ title, sub, onClose, children }) {
+        useEffect(() => {
+          const h = (e) => {
+            if (e.key === "Escape") onClose();
+          };
+          window.addEventListener("keydown", h);
+          return () => window.removeEventListener("keydown", h);
+        }, [onClose]);
+        return (
+          <div
+            className="modal-overlay"
+            onClick={(e) => e.target === e.currentTarget && onClose()}
+          >
+            <div className="modal">
+              <div className="modal-title">{title}</div>
+              {sub && <div className="modal-sub">{sub}</div>}
+              {children}
+            </div>
+          </div>
+        );
+      }
+
+      // ─── Confirm Modal ────────────────────────────────────────────────────────────
+      function ConfirmModal({ title, text, onConfirm, onClose, loading }) {
+        return (
+          <Modal title={title} onClose={onClose}>
+            <p className="confirm-text">{text}</p>
+            <div className="modal-actions">
+              <button className="btn btn-ghost" onClick={onClose}>
+                Cancel
+              </button>
+              <button
+                className="btn btn-danger"
+                onClick={onConfirm}
+                disabled={loading}
+              >
+                {loading ? <span className="spinner" /> : null} Delete
+              </button>
+            </div>
+          </Modal>
+        );
+      }
+
+      // ─── Login Page ───────────────────────────────────────────────────────────────
+      function LoginPage({ navigate, setUser }) {
+        const [form, setForm] = useState({ username: "", password: "" });
+        const [loading, setLoading] = useState(false);
+        const [err, setErr] = useState("");
+        const [showPw, setShowPw] = useState(false);
+        const toast = useToast();
+
+        async function submit(e) {
+          e.preventDefault();
+          setLoading(true);
+          setErr("");
+          try {
+            await api("POST", "/user/login", form);
+            // Store role info — we'll use a simple ping approach
+            // We'll store username in localStorage for display
+            localStorage.setItem(
+              "lp_user",
+              JSON.stringify({ username: form.username, role: "admin" }),
+            );
+            setUser({ username: form.username, role: "admin" });
+            toast("Logged in successfully", "success");
+            navigate("/dashboard");
+          } catch (e) {
+            setErr(e.message);
+          } finally {
+            setLoading(false);
+          }
+        }
+
+        return (
+          <div className="auth-shell">
+            <div className="auth-bg" />
+            <div className="auth-card">
+              <div className="auth-logo">Logical Plane</div>
+              <div className="auth-sub">Sign in to your organization</div>
+              {err && (
+                <div
+                  className="warn-box"
+                  style={{
+                    background: "var(--red-dim)",
+                    borderColor: "rgba(240,96,96,0.2)",
+                    color: "var(--red)",
+                    marginBottom: 16,
+                  }}
+                >
+                  {err}
+                </div>
+              )}
+              <form onSubmit={submit}>
+                <div className="form-group">
+                  <label className="form-label">Username</label>
+                  <input
+                    className="form-input"
+                    value={form.username}
+                    onChange={(e) =>
+                      setForm({ ...form, username: e.target.value })
+                    }
+                    placeholder="your_username"
+                    autoFocus
+                  />
+                </div>
+                <div className="form-group" style={{ position: "relative" }}>
+                  <label className="form-label">Password</label>
+                  <input
+                    className="form-input"
+                    type={showPw ? "text" : "password"}
+                    value={form.password}
+                    onChange={(e) =>
+                      setForm({ ...form, password: e.target.value })
+                    }
+                    placeholder="••••••••"
+                    style={{ paddingRight: 38 }}
+                  />
+                  <button
+                    type="button"
+                    style={{
+                      position: "absolute",
+                      right: 10,
+                      top: 28,
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "var(--text3)",
+                      padding: 2,
+                    }}
+                    onClick={() => setShowPw(!showPw)}
+                  >
+                    {showPw ? Icon.eyeOff : Icon.eye}
+                  </button>
+                </div>
+                <button
+                  className="btn btn-primary"
+                  style={{
+                    width: "100%",
+                    justifyContent: "center",
+                    marginTop: 4,
+                  }}
+                  disabled={loading}
+                >
+                  {loading ? <span className="spinner" /> : "Sign In"}
+                </button>
+              </form>
+              <div className="auth-switch">
+                Don't have an org?{" "}
+                <a onClick={() => navigate("/register")}>Register</a>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // ─── Register Page ────────────────────────────────────────────────────────────
+      function RegisterPage({ navigate }) {
+        const [form, setForm] = useState({
+          organizationName: "",
+          adminUsername: "",
+          adminPassword: "",
+        });
+        const [loading, setLoading] = useState(false);
+        const [err, setErr] = useState("");
+        const [showPw, setShowPw] = useState(false);
+        const toast = useToast();
+
+        async function submit(e) {
+          e.preventDefault();
+          if (form.adminPassword.length < 8) {
+            setErr("Password must be at least 8 characters");
+            return;
+          }
+          setLoading(true);
+          setErr("");
+          try {
+            await api("POST", "/organization/create", form);
+            toast("Organization created! Please login.", "success");
+            navigate("/login");
+          } catch (e) {
+            setErr(e.message);
+          } finally {
+            setLoading(false);
+          }
+        }
+
+        return (
+          <div className="auth-shell">
+            <div className="auth-bg" />
+            <div className="auth-card">
+              <div className="auth-logo">Logical Plane</div>
+              <div className="auth-sub">Create a new organization</div>
+              {err && (
+                <div
+                  className="warn-box"
+                  style={{
+                    background: "var(--red-dim)",
+                    borderColor: "rgba(240,96,96,0.2)",
+                    color: "var(--red)",
+                    marginBottom: 16,
+                  }}
+                >
+                  {err}
+                </div>
+              )}
+              <form onSubmit={submit}>
+                <div className="form-group">
+                  <label className="form-label">Organization Name</label>
+                  <input
+                    className="form-input"
+                    value={form.organizationName}
+                    onChange={(e) =>
+                      setForm({ ...form, organizationName: e.target.value })
+                    }
+                    placeholder="Acme Corp"
+                    autoFocus
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Admin Username</label>
+                  <input
+                    className="form-input"
+                    value={form.adminUsername}
+                    onChange={(e) =>
+                      setForm({ ...form, adminUsername: e.target.value })
+                    }
+                    placeholder="admin"
+                    required
+                  />
+                </div>
+                <div className="form-group" style={{ position: "relative" }}>
+                  <label className="form-label">Admin Password</label>
+                  <input
+                    className="form-input"
+                    type={showPw ? "text" : "password"}
+                    value={form.adminPassword}
+                    onChange={(e) =>
+                      setForm({ ...form, adminPassword: e.target.value })
+                    }
+                    placeholder="min 8 characters"
+                    style={{ paddingRight: 38 }}
+                    required
+                  />
+                  <button
+                    type="button"
+                    style={{
+                      position: "absolute",
+                      right: 10,
+                      top: 28,
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "var(--text3)",
+                      padding: 2,
+                    }}
+                    onClick={() => setShowPw(!showPw)}
+                  >
+                    {showPw ? Icon.eyeOff : Icon.eye}
+                  </button>
+                </div>
+                <button
+                  className="btn btn-primary"
+                  style={{
+                    width: "100%",
+                    justifyContent: "center",
+                    marginTop: 4,
+                  }}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <span className="spinner" />
+                  ) : (
+                    "Create Organization"
+                  )}
+                </button>
+              </form>
+              <div className="auth-switch">
+                Already have an account?{" "}
+                <a onClick={() => navigate("/login")}>Sign in</a>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // ─── Dashboard ────────────────────────────────────────────────────────────────
+      function DashboardPage() {
+        const { user } = useAuth();
+        const [apps, setApps] = useState([]);
+        const [loading, setLoading] = useState(true);
+
+        useEffect(() => {
+          api("GET", "/application/")
+            .then((d) => setApps(d.applications || []))
+            .catch(() => {})
+            .finally(() => setLoading(false));
+        }, []);
+
+        const envCounts = apps.length;
+
+        return (
+          <div className="page-fade">
+            <div className="section-header">
+              <div>
+                <div className="section-title">Dashboard</div>
+                <div className="section-sub">
+                  Welcome back, {user?.username}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid3" style={{ marginBottom: 24 }}>
+              <div className="stat-card">
+                <div className="stat-val">{loading ? "—" : apps.length}</div>
+                <div className="stat-label">Applications</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-val" style={{ color: "var(--accent)" }}>
+                  {user?.role === "admin" ? "Admin" : "User"}
+                </div>
+                <div className="stat-label">Your Role</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-val" style={{ color: "var(--green)" }}>
+                  Active
+                </div>
+                <div className="stat-label">Status</div>
+              </div>
+            </div>
+
+            <div className="card">
+              <div className="card-title">Recent Applications</div>
+              {loading ? (
+                <div style={{ color: "var(--text3)", fontSize: 12 }}>
+                  Loading...
+                </div>
+              ) : apps.length === 0 ? (
+                <div className="empty">
+                  <div className="empty-icon">◻</div>
+                  <div className="empty-text">
+                    No applications yet. Create one to get started.
+                  </div>
+                </div>
+              ) : (
+                <div className="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Created</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {apps.slice(0, 5).map((a) => (
+                        <tr key={a.id}>
+                          <td className="td-name">{a.name}</td>
+                          <td>
+                            {a.description || (
+                              <span style={{ color: "var(--text3)" }}>—</span>
+                            )}
+                          </td>
+                          <td>{new Date(a.created_at).toLocaleDateString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      // ─── Applications Page ────────────────────────────────────────────────────────
+      function ApplicationsPage() {
+        const { user } = useAuth();
+        const toast = useToast();
+        const [apps, setApps] = useState([]);
+        const [loading, setLoading] = useState(true);
+        const [expanded, setExpanded] = useState({});
+        const [envs, setEnvs] = useState({});
+        const [showCreate, setShowCreate] = useState(false);
+        const [showCreateEnv, setShowCreateEnv] = useState(null);
+        const [confirmDelete, setConfirmDelete] = useState(null);
+        const [confirmDeleteEnv, setConfirmDeleteEnv] = useState(null);
+        const [deleting, setDeleting] = useState(false);
+        const [form, setForm] = useState({ name: "", description: "" });
+        const [envForm, setEnvForm] = useState({
+          name: "prod",
+          applicationId: null,
+        });
+        const [creating, setCreating] = useState(false);
+
+        const load = () =>
+          api("GET", "/application/")
+            .then((d) => setApps(d.applications || []))
+            .catch(() => {})
+            .finally(() => setLoading(false));
+        useEffect(() => {
+          load();
+        }, []);
+
+        async function loadEnvs(appId) {
+          try {
+            const d = await api("GET", "/application/envs", undefined);
+            // Since GET passes body - we need to use POST-style workaround
+            // The backend uses req.body for GET /envs — we'll send as body
+          } catch {}
+        }
+
+        async function fetchEnvs(appId) {
+          try {
+            const res = await fetch(BASE + "/application/envs", {
+              method: "GET",
+              credentials: "include",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ applicationId: appId }),
+            });
+            const data = await res.json();
+            setEnvs((prev) => ({ ...prev, [appId]: data.environments || [] }));
+          } catch {}
+        }
+
+        function toggleExpand(appId) {
+          const next = !expanded[appId];
+          setExpanded((prev) => ({ ...prev, [appId]: next }));
+          if (next && !envs[appId]) fetchEnvs(appId);
+        }
+
+        async function createApp(e) {
+          e.preventDefault();
+          setCreating(true);
+          try {
+            const d = await api("POST", "/application/create", form);
+            setApps((prev) => [d.application, ...prev]);
+            setShowCreate(false);
+            setForm({ name: "", description: "" });
+            toast("Application created", "success");
+          } catch (e) {
+            toast(e.message, "error");
+          } finally {
+            setCreating(false);
+          }
+        }
+
+        async function deleteApp() {
+          setDeleting(true);
+          try {
+            await api("DELETE", "/application/delete", {
+              applicationId: confirmDelete.id,
+            });
+            setApps((prev) => prev.filter((a) => a.id !== confirmDelete.id));
+            setConfirmDelete(null);
+            toast("Application deleted", "success");
+          } catch (e) {
+            toast(e.message, "error");
+          } finally {
+            setDeleting(false);
+          }
+        }
+
+        async function createEnv(e) {
+          e.preventDefault();
+          setCreating(true);
+          try {
+            const d = await api("POST", "/application/envs/create", {
+              name: envForm.name,
+              applicationId: showCreateEnv,
+            });
+            setEnvs((prev) => ({
+              ...prev,
+              [showCreateEnv]: [d.environment, ...(prev[showCreateEnv] || [])],
+            }));
+            setShowCreateEnv(null);
+            toast("Environment created", "success");
+          } catch (e) {
+            toast(e.message, "error");
+          } finally {
+            setCreating(false);
+          }
+        }
+
+        async function deleteEnv() {
+          setDeleting(true);
+          try {
+            await api("DELETE", "/application/envs/delete", {
+              environmentId: confirmDeleteEnv.id,
+            });
+            const appId = confirmDeleteEnv.appId;
+            setEnvs((prev) => ({
+              ...prev,
+              [appId]: (prev[appId] || []).filter(
+                (e) => e.id !== confirmDeleteEnv.id,
+              ),
+            }));
+            setConfirmDeleteEnv(null);
+            toast("Environment deleted", "success");
+          } catch (e) {
+            toast(e.message, "error");
+          } finally {
+            setDeleting(false);
+          }
+        }
+
+        const envBadge = (name) => {
+          const cls = {
+            prod: "badge-prod",
+            staging: "badge-staging",
+            dev: "badge-dev",
+            test: "badge-test",
+          };
+          return (
+            <span className={`badge ${cls[name] || "badge-test"}`}>{name}</span>
+          );
+        };
+
+        const isAdmin = user?.role === "admin";
+
+        return (
+          <div className="page-fade">
+            <div className="section-header">
+              <div>
+                <div className="section-title">Applications</div>
+                <div className="section-sub">
+                  Manage your apps and environments
+                </div>
+              </div>
+              {isAdmin && (
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setShowCreate(true)}
+                >
+                  {Icon.plus} New App
+                </button>
+              )}
+            </div>
+
+            {loading ? (
+              <div style={{ color: "var(--text3)", fontSize: 12 }}>
+                Loading...
+              </div>
+            ) : apps.length === 0 ? (
+              <div className="empty">
+                <div className="empty-icon">◻</div>
+                <div className="empty-text">No applications yet.</div>
+                {isAdmin && (
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => setShowCreate(true)}
+                  >
+                    {Icon.plus} Create Application
+                  </button>
+                )}
+              </div>
+            ) : (
+              apps.map((app) => (
+                <div className="app-row" key={app.id}>
+                  <div
+                    className="app-row-header"
+                    onClick={() => toggleExpand(app.id)}
+                  >
+                    <span
+                      className={`chevron ${expanded[app.id] ? "open" : ""}`}
+                    >
+                      {Icon.chevron}
+                    </span>
+                    <div style={{ flex: 1 }}>
+                      <div className="app-row-name">{app.name}</div>
+                      {app.description && (
+                        <div className="app-row-desc">{app.description}</div>
+                      )}
+                    </div>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        color: "var(--text3)",
+                        marginRight: 12,
+                      }}
+                    >
+                      {new Date(app.created_at).toLocaleDateString()}
+                    </span>
+                    {isAdmin && (
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setConfirmDelete(app);
+                        }}
+                      >
+                        {Icon.trash}
+                      </button>
+                    )}
+                  </div>
+                  {expanded[app.id] && (
+                    <div className="app-row-body">
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          marginBottom: 12,
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: 11,
+                            color: "var(--text3)",
+                            textTransform: "uppercase",
+                            letterSpacing: "1px",
+                          }}
+                        >
+                          Environments
+                        </span>
+                        {isAdmin && (
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            onClick={() => {
+                              setShowCreateEnv(app.id);
+                              setEnvForm({
+                                name: "prod",
+                                applicationId: app.id,
+                              });
+                            }}
+                          >
+                            {Icon.plus} Add Env
+                          </button>
+                        )}
+                      </div>
+                      {!envs[app.id] ? (
+                        <div style={{ color: "var(--text3)", fontSize: 12 }}>
+                          Loading environments...
+                        </div>
+                      ) : envs[app.id].length === 0 ? (
+                        <div style={{ color: "var(--text3)", fontSize: 12 }}>
+                          No environments. Add one to get started.
+                        </div>
+                      ) : (
+                        <div className="env-list">
+                          {envs[app.id].map((env) => (
+                            <div key={env.id} className="env-pill">
+                              {envBadge(env.name)}
+                              <span
+                                style={{ fontSize: 10, color: "var(--text3)" }}
+                              >
+                                {new Date(env.created_at).toLocaleDateString()}
+                              </span>
+                              {isAdmin && (
+                                <button
+                                  style={{
+                                    background: "none",
+                                    border: "none",
+                                    cursor: "pointer",
+                                    color: "var(--text3)",
+                                    padding: "0 2px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                                  onClick={() =>
+                                    setConfirmDeleteEnv({
+                                      ...env,
+                                      appId: app.id,
+                                    })
+                                  }
+                                >
+                                  {Icon.trash}
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+
+            {/* Create App Modal */}
+            {showCreate && (
+              <Modal
+                title="Create Application"
+                sub="Add a new application to your organization"
+                onClose={() => setShowCreate(false)}
+              >
+                <form onSubmit={createApp}>
+                  <div className="form-group">
+                    <label className="form-label">Application Name</label>
+                    <input
+                      className="form-input"
+                      value={form.name}
+                      onChange={(e) =>
+                        setForm({ ...form, name: e.target.value })
+                      }
+                      placeholder="my-app"
+                      required
+                      autoFocus
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">
+                      Description{" "}
+                      <span style={{ color: "var(--text3)" }}>(optional)</span>
+                    </label>
+                    <input
+                      className="form-input"
+                      value={form.description}
+                      onChange={(e) =>
+                        setForm({ ...form, description: e.target.value })
+                      }
+                      placeholder="Brief description..."
+                    />
+                  </div>
+                  <div className="modal-actions">
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      onClick={() => setShowCreate(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={creating}
+                    >
+                      {creating ? <span className="spinner" /> : null} Create
+                    </button>
+                  </div>
+                </form>
+              </Modal>
+            )}
+
+            {/* Create Env Modal */}
+            {showCreateEnv && (
+              <Modal
+                title="Add Environment"
+                sub="Select the environment type to add"
+                onClose={() => setShowCreateEnv(null)}
+              >
+                <form onSubmit={createEnv}>
+                  <div className="form-group">
+                    <label className="form-label">Environment</label>
+                    <select
+                      className="form-select"
+                      value={envForm.name}
+                      onChange={(e) =>
+                        setEnvForm({ ...envForm, name: e.target.value })
+                      }
+                    >
+                      <option value="prod">prod — Production</option>
+                      <option value="staging">staging — Staging</option>
+                      <option value="dev">dev — Development</option>
+                      <option value="test">test — Test</option>
+                    </select>
+                  </div>
+                  <div className="modal-actions">
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      onClick={() => setShowCreateEnv(null)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={creating}
+                    >
+                      {creating ? <span className="spinner" /> : null} Add
+                    </button>
+                  </div>
+                </form>
+              </Modal>
+            )}
+
+            {/* Delete App Confirm */}
+            {confirmDelete && (
+              <ConfirmModal
+                title="Delete Application"
+                text={`Are you sure you want to delete "${confirmDelete.name}"? This will also remove all its environments and cannot be undone.`}
+                onConfirm={deleteApp}
+                onClose={() => setConfirmDelete(null)}
+                loading={deleting}
+              />
+            )}
+
+            {/* Delete Env Confirm */}
+            {confirmDeleteEnv && (
+              <ConfirmModal
+                title="Delete Environment"
+                text={`Delete the "${confirmDeleteEnv.name}" environment? This cannot be undone.`}
+                onConfirm={deleteEnv}
+                onClose={() => setConfirmDeleteEnv(null)}
+                loading={deleting}
+              />
+            )}
+          </div>
+        );
+      }
+
+      // ─── API Keys Page ────────────────────────────────────────────────────────────
+      function ApiKeysPage() {
+        const { user } = useAuth();
+        const toast = useToast();
+        const [keys, setKeys] = useState([]);
+        const [showCreate, setShowCreate] = useState(false);
+        const [newKey, setNewKey] = useState(null);
+        const [confirmRevoke, setConfirmRevoke] = useState(null);
+        const [revoking, setRevoking] = useState(false);
+        const [creating, setCreating] = useState(false);
+        const [copied, setCopied] = useState(false);
+        const [form, setForm] = useState({
+          name: "",
+          rateLimitPerSec: "1000",
+          expiresAt: "",
+        });
+
+        // Keys aren't listable from the API (only generate/revoke), so we track locally
+        useEffect(() => {
+          const saved = localStorage.getItem("lp_keys");
+          if (saved) setKeys(JSON.parse(saved));
+        }, []);
+
+        function saveKeys(k) {
+          setKeys(k);
+          localStorage.setItem("lp_keys", JSON.stringify(k));
+        }
+
+        async function generate(e) {
+          e.preventDefault();
+          setCreating(true);
+          try {
+            const body = {
+              name: form.name,
+              rateLimitPerSec: parseInt(form.rateLimitPerSec) || 1000,
+              expiresAt: form.expiresAt || null,
+            };
+            const d = await api("POST", "/apikey/generate", body);
+            setNewKey(d.apiKey);
+            const entry = { ...d.key, masked: d.apiKey.slice(0, 10) + "..." };
+            saveKeys([entry, ...keys]);
+            setShowCreate(false);
+            setForm({ name: "", rateLimitPerSec: "1000", expiresAt: "" });
+            toast("API key generated", "success");
+          } catch (e) {
+            toast(e.message, "error");
+          } finally {
+            setCreating(false);
+          }
+        }
+
+        async function revoke() {
+          setRevoking(true);
+          try {
+            await api("DELETE", "/apikey/revoke", {
+              apiKeyId: confirmRevoke.id,
+            });
+            saveKeys(keys.filter((k) => k.id !== confirmRevoke.id));
+            setConfirmRevoke(null);
+            toast("API key revoked", "success");
+          } catch (e) {
+            toast(e.message, "error");
+          } finally {
+            setRevoking(false);
+          }
+        }
+
+        function copyKey() {
+          navigator.clipboard.writeText(newKey).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+          });
+        }
+
+        const isAdmin = user?.role === "admin";
+
+        return (
+          <div className="page-fade">
+            <div className="section-header">
+              <div>
+                <div className="section-title">API Keys</div>
+                <div className="section-sub">Manage organization API keys</div>
+              </div>
+              {isAdmin && (
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setShowCreate(true)}
+                >
+                  {Icon.plus} Generate Key
+                </button>
+              )}
+            </div>
+
+            <div className="card">
+              {keys.length === 0 ? (
+                <div className="empty">
+                  <div className="empty-icon">◈</div>
+                  <div className="empty-text">No API keys yet.</div>
+                  {isAdmin && (
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => setShowCreate(true)}
+                    >
+                      {Icon.plus} Generate Key
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Key Preview</th>
+                        <th>Rate Limit</th>
+                        <th>Expires</th>
+                        <th>Created</th>
+                        {isAdmin && <th></th>}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {keys.map((k) => (
+                        <tr key={k.id}>
+                          <td className="td-name">{k.name}</td>
+                          <td>
+                            <span
+                              style={{
+                                fontFamily: "DM Mono",
+                                fontSize: 11,
+                                color: "var(--text3)",
+                              }}
+                            >
+                              {k.masked || "lk_••••••••••..."}
+                            </span>
+                          </td>
+                          <td>
+                            <span
+                              className="badge"
+                              style={{
+                                background: "var(--accent-dim)",
+                                color: "var(--accent)",
+                              }}
+                            >
+                              {k.rate_limit_per_sec}/s
+                            </span>
+                          </td>
+                          <td>
+                            {k.expires_at ? (
+                              new Date(k.expires_at).toLocaleDateString()
+                            ) : (
+                              <span style={{ color: "var(--text3)" }}>
+                                Never
+                              </span>
+                            )}
+                          </td>
+                          <td>{new Date(k.created_at).toLocaleDateString()}</td>
+                          {isAdmin && (
+                            <td>
+                              <button
+                                className="btn btn-danger btn-sm"
+                                onClick={() => setConfirmRevoke(k)}
+                              >
+                                {Icon.trash} Revoke
+                              </button>
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Generate Modal */}
+            {showCreate && (
+              <Modal
+                title="Generate API Key"
+                sub="Create a new API key for your organization"
+                onClose={() => setShowCreate(false)}
+              >
+                <form onSubmit={generate}>
+                  <div className="form-group">
+                    <label className="form-label">Key Name</label>
+                    <input
+                      className="form-input"
+                      value={form.name}
+                      onChange={(e) =>
+                        setForm({ ...form, name: e.target.value })
+                      }
+                      placeholder="e.g. production-key"
+                      required
+                      autoFocus
+                    />
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label className="form-label">Rate Limit (req/sec)</label>
+                      <input
+                        className="form-input"
+                        type="number"
+                        value={form.rateLimitPerSec}
+                        onChange={(e) =>
+                          setForm({ ...form, rateLimitPerSec: e.target.value })
+                        }
+                        placeholder="1000"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">
+                        Expires At{" "}
+                        <span style={{ color: "var(--text3)" }}>
+                          (optional)
+                        </span>
+                      </label>
+                      <input
+                        className="form-input"
+                        type="date"
+                        value={form.expiresAt}
+                        onChange={(e) =>
+                          setForm({ ...form, expiresAt: e.target.value })
+                        }
+                        style={{ colorScheme: "dark" }}
+                      />
+                    </div>
+                  </div>
+                  <div className="modal-actions">
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      onClick={() => setShowCreate(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={creating}
+                    >
+                      {creating ? <span className="spinner" /> : null} Generate
+                    </button>
+                  </div>
+                </form>
+              </Modal>
+            )}
+
+            {/* New Key Display Modal */}
+            {newKey && (
+              <Modal
+                title="API Key Generated"
+                sub="Copy and store this key securely — it will not be shown again."
+                onClose={() => setNewKey(null)}
+              >
+                <div className="warn-box">
+                  ⚠ This is the only time you will see this key. Store it
+                  somewhere safe immediately.
+                </div>
+                <div className="key-box">
+                  {newKey}
+                  <button
+                    className="btn btn-ghost btn-sm copy-btn"
+                    onClick={copyKey}
+                    style={{ position: "absolute", top: 8, right: 8 }}
+                  >
+                    {Icon.copy} {copied ? "Copied!" : "Copy"}
+                  </button>
+                </div>
+                <div className="modal-actions" style={{ marginTop: 16 }}>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => setNewKey(null)}
+                  >
+                    I've saved the key
+                  </button>
+                </div>
+              </Modal>
+            )}
+
+            {/* Revoke Confirm */}
+            {confirmRevoke && (
+              <ConfirmModal
+                title="Revoke API Key"
+                text={`Revoke "${confirmRevoke.name}"? Any services using this key will immediately lose access.`}
+                onConfirm={revoke}
+                onClose={() => setConfirmRevoke(null)}
+                loading={revoking}
+              />
+            )}
+          </div>
+        );
+      }
+
+      // ─── Users Page ───────────────────────────────────────────────────────────────
+      function UsersPage() {
+        const { user } = useAuth();
+        const toast = useToast();
+        const [users, setUsers] = useState([]);
+        const [showCreate, setShowCreate] = useState(false);
+        const [creating, setCreating] = useState(false);
+        const [confirmDelete, setConfirmDelete] = useState(null);
+        const [deleting, setDeleting] = useState(false);
+        const [showPw, setShowPw] = useState(false);
+        const [form, setForm] = useState({
+          username: "",
+          password: "",
+          role: "user",
+        });
+
+        // Persist users locally since no list endpoint
+        useEffect(() => {
+          const saved = localStorage.getItem("lp_users");
+          if (saved) setUsers(JSON.parse(saved));
+        }, []);
+
+        function saveUsers(u) {
+          setUsers(u);
+          localStorage.setItem("lp_users", JSON.stringify(u));
+        }
+
+        async function createUser(e) {
+          e.preventDefault();
+          if (form.password.length < 8) {
+            toast("Password must be at least 8 characters", "error");
+            return;
+          }
+          setCreating(true);
+          try {
+            const d = await api("POST", "/user/create", form);
+            saveUsers([d.user, ...users]);
+            setShowCreate(false);
+            setForm({ username: "", password: "", role: "user" });
+            toast("User created", "success");
+          } catch (e) {
+            toast(e.message, "error");
+          } finally {
+            setCreating(false);
+          }
+        }
+
+        async function deleteUser() {
+          setDeleting(true);
+          try {
+            await api("DELETE", "/user/delete", { userId: confirmDelete.id });
+            saveUsers(users.filter((u) => u.id !== confirmDelete.id));
+            setConfirmDelete(null);
+            toast("User deleted", "success");
+          } catch (e) {
+            toast(e.message, "error");
+          } finally {
+            setDeleting(false);
+          }
+        }
+
+        if (user?.role !== "admin") {
+          return (
+            <div className="page-fade">
+              <div className="empty">
+                <div className="empty-icon">⊘</div>
+                <div className="empty-text">
+                  Admin access required to manage users.
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        return (
+          <div className="page-fade">
+            <div className="section-header">
+              <div>
+                <div className="section-title">Users</div>
+                <div className="section-sub">Manage organization members</div>
+              </div>
+              <button
+                className="btn btn-primary"
+                onClick={() => setShowCreate(true)}
+              >
+                {Icon.plus} Add User
+              </button>
+            </div>
+
+            <div className="card">
+              {users.length === 0 ? (
+                <div className="empty">
+                  <div className="empty-icon">◎</div>
+                  <div className="empty-text">No users added yet.</div>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => setShowCreate(true)}
+                  >
+                    {Icon.plus} Add User
+                  </button>
+                </div>
+              ) : (
+                <div className="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Created</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {users.map((u) => (
+                        <tr key={u.id}>
+                          <td className="td-name">{u.username}</td>
+                          <td>
+                            <span className={`badge badge-${u.role}`}>
+                              {u.role}
+                            </span>
+                          </td>
+                          <td>{new Date(u.created_at).toLocaleDateString()}</td>
+                          <td>
+                            <button
+                              className="btn btn-danger btn-sm"
+                              onClick={() => setConfirmDelete(u)}
+                            >
+                              {Icon.trash} Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {showCreate && (
+              <Modal
+                title="Add User"
+                sub="Create a new user in your organization"
+                onClose={() => setShowCreate(false)}
+              >
+                <form onSubmit={createUser}>
+                  <div className="form-group">
+                    <label className="form-label">Username</label>
+                    <input
+                      className="form-input"
+                      value={form.username}
+                      onChange={(e) =>
+                        setForm({ ...form, username: e.target.value })
+                      }
+                      placeholder="new_user"
+                      required
+                      autoFocus
+                    />
+                  </div>
+                  <div className="form-group" style={{ position: "relative" }}>
+                    <label className="form-label">Password</label>
+                    <input
+                      className="form-input"
+                      type={showPw ? "text" : "password"}
+                      value={form.password}
+                      onChange={(e) =>
+                        setForm({ ...form, password: e.target.value })
+                      }
+                      placeholder="min 8 characters"
+                      style={{ paddingRight: 38 }}
+                      required
+                    />
+                    <button
+                      type="button"
+                      style={{
+                        position: "absolute",
+                        right: 10,
+                        top: 28,
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        color: "var(--text3)",
+                        padding: 2,
+                      }}
+                      onClick={() => setShowPw(!showPw)}
+                    >
+                      {showPw ? Icon.eyeOff : Icon.eye}
+                    </button>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Role</label>
+                    <select
+                      className="form-select"
+                      value={form.role}
+                      onChange={(e) =>
+                        setForm({ ...form, role: e.target.value })
+                      }
+                    >
+                      <option value="user">user — Standard access</option>
+                      <option value="admin">admin — Full access</option>
+                    </select>
+                  </div>
+                  <div className="modal-actions">
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      onClick={() => setShowCreate(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={creating}
+                    >
+                      {creating ? <span className="spinner" /> : null} Create
+                    </button>
+                  </div>
+                </form>
+              </Modal>
+            )}
+
+            {confirmDelete && (
+              <ConfirmModal
+                title="Delete User"
+                text={`Delete "${confirmDelete.username}"? This cannot be undone. Note: the last admin cannot be deleted.`}
+                onConfirm={deleteUser}
+                onClose={() => setConfirmDelete(null)}
+                loading={deleting}
+              />
+            )}
+          </div>
+        );
+      }
+
+      // ─── Logs Page ────────────────────────────────────────────────────────────────
+      function LogsPage() {
+        const [logs, setLogs] = useState([]);
+        const [filter, setFilter] = useState({
+          level: "all",
+          env: "all",
+          search: "",
+        });
+        const [page, setPage] = useState(1);
+        const [perPage, setPerPage] = useState(20);
+        const [total, setTotal] = useState(0);
+        const [loading, setLoading] = useState(false);
+        const [error, setError] = useState(null);
+
+        const fetchLogs = useCallback(async () => {
+          setLoading(true);
+          setError(null);
+          try {
+            const params = new URLSearchParams();
+            if (filter.level !== "all") params.append("level", filter.level);
+            if (filter.env !== "all") params.append("environment", filter.env);
+            if (filter.search.trim()) params.append("q", filter.search.trim());
+            params.append("page", page);
+            params.append("perPage", perPage);
+
+            const data = await api("GET", `/logs?${params.toString()}`);
+            setLogs(data.logs || []);
+            setTotal(data.total || 0);
+          } catch (e) {
+            setError(e.message || "Failed to fetch logs");
+            setLogs([]);
+            setTotal(0);
+          } finally {
+            setLoading(false);
+          }
+        }, [filter, page, perPage]);
+
+        useEffect(() => {
+          fetchLogs();
+        }, [fetchLogs]);
+
+        const changeFilter = (key, value) => {
+          setFilter((prev) => ({ ...prev, [key]: value }));
+          setPage(1);
+        };
+
+        const totalPages = Math.max(1, Math.ceil(total / perPage));
+
+        return (
+          <div className="page-fade">
+            <div className="section-header">
+              <div>
+                <div className="section-title">Logs</div>
+                <div className="section-sub">
+                  Application event logs from OpenSearch
+                </div>
+              </div>
+              <span
+                className="badge"
+                style={{
+                  background: "var(--green-dim)",
+                  color: "var(--green)",
+                  fontSize: 10,
+                }}
+              >
+                OpenSearch
+              </span>
+            </div>
+
+            <div
+              className="card-sm"
+              style={{
+                marginBottom: 16,
+                display: "flex",
+                gap: 12,
+                flexWrap: "wrap",
+                alignItems: "center",
+              }}
+            >
+              <input
+                className="form-input"
+                style={{ flex: 1, minWidth: 180 }}
+                placeholder="Search messages, metadata..."
+                value={filter.search}
+                onChange={(e) => changeFilter("search", e.target.value)}
+              />
+              <select
+                className="form-select"
+                style={{ width: 140 }}
+                value={filter.level}
+                onChange={(e) => changeFilter("level", e.target.value)}
+              >
+                <option value="all">All Levels</option>
+                <option value="info">Info</option>
+                <option value="warn">Warn</option>
+                <option value="error">Error</option>
+              </select>
+              <select
+                className="form-select"
+                style={{ width: 140 }}
+                value={filter.env}
+                onChange={(e) => changeFilter("env", e.target.value)}
+              >
+                <option value="all">All Envs</option>
+                <option value="prod">prod</option>
+                <option value="staging">staging</option>
+                <option value="dev">dev</option>
+                <option value="test">test</option>
+              </select>
+              <select
+                className="form-select"
+                style={{ width: 110 }}
+                value={perPage}
+                onChange={(e) => setPerPage(Number(e.target.value))}
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={() => fetchLogs()}
+                disabled={loading}
+              >
+                {loading ? <span className="spinner" /> : "Refresh"}
+              </button>
+            </div>
+
+            {error && (
+              <div
+                className="card"
+                style={{ marginBottom: 16, color: "var(--red)" }}
+              >
+                Error: {error}
+              </div>
+            )}
+
+            <div className="card" style={{ padding: 0 }}>
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Time</th>
+                      <th>Level</th>
+                      <th>Application</th>
+                      <th>Environment</th>
+                      <th>Message</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loading ? (
+                      <tr>
+                        <td
+                          colSpan={5}
+                          style={{ textAlign: "center", padding: "24px" }}
+                        >
+                          <span className="spinner" /> Loading logs...
+                        </td>
+                      </tr>
+                    ) : logs.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan={5}
+                          style={{
+                            textAlign: "center",
+                            color: "var(--text3)",
+                            padding: "32px",
+                          }}
+                        >
+                          No logs found.
+                        </td>
+                      </tr>
+                    ) : (
+                      logs.map((l) => (
+                        <tr
+                          key={
+                            l.id ||
+                            `${l.application}-${l.timestamp}-${Math.random()}`
+                          }
+                        >
+                          <td
+                            style={{
+                              color: "var(--text3)",
+                              whiteSpace: "nowrap",
+                              fontSize: 11,
+                            }}
+                          >
+                            {new Date(
+                              l["@timestamp"] || l.timestamp,
+                            ).toLocaleString()}
+                          </td>
+                          <td>
+                            <span
+                              className={`log-level-${l.level || "info"}`}
+                              style={{
+                                fontWeight: 600,
+                                fontSize: 11,
+                                textTransform: "uppercase",
+                              }}
+                            >
+                              {l.level || "info"}
+                            </span>
+                          </td>
+                          <td style={{ color: "var(--accent)", fontSize: 11 }}>
+                            {l.application || l.source || "-"}
+                          </td>
+                          <td>
+                            <span
+                              className={`badge badge-${l.environment || l.env || "prod"}`}
+                            >
+                              {l.environment || l.env || "-"}
+                            </span>
+                          </td>
+                          <td
+                            style={{
+                              color: "var(--text)",
+                              maxWidth: 320,
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {l.message ||
+                              JSON.stringify(l.metadata || "").slice(0, 140)}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "10px 0",
+              }}
+            >
+              <div style={{ color: "var(--text3)", fontSize: "11px" }}>
+                Total logs: {total}
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <button
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                >
+                  Prev
+                </button>
+                <span style={{ fontSize: 12 }}>
+                  {page} / {totalPages}
+                </span>
+                <button
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // ─── Settings Page ────────────────────────────────────────────────────────────
+      function SettingsPage() {
+        const { user, logout } = useAuth();
+        const toast = useToast();
+        const [confirmDelete, setConfirmDelete] = useState(false);
+        const [deleting, setDeleting] = useState(false);
+        const [orgId, setOrgId] = useState("");
+
+        async function deleteOrg() {
+          setDeleting(true);
+          try {
+            await api("DELETE", "/organization/delete", {
+              organizationId: parseInt(orgId),
+            });
+            toast("Organization deleted", "success");
+            setTimeout(() => logout(), 1000);
+          } catch (e) {
+            toast(e.message, "error");
+          } finally {
+            setDeleting(false);
+          }
+        }
+
+        const isAdmin = user?.role === "admin";
+
+        return (
+          <div className="page-fade">
+            <div className="section-header">
+              <div>
+                <div className="section-title">Settings</div>
+                <div className="section-sub">Organization configuration</div>
+              </div>
+            </div>
+
+            <div className="card" style={{ marginBottom: 16 }}>
+              <div className="card-title">Account</div>
+              <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
+                <div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: "var(--text3)",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.5px",
+                      marginBottom: 4,
+                    }}
+                  >
+                    Logged in as
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: "var(--text)",
+                    }}
+                  >
+                    {user?.username}
+                  </div>
+                </div>
+                <div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: "var(--text3)",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.5px",
+                      marginBottom: 4,
+                    }}
+                  >
+                    Role
+                  </div>
+                  <span className={`badge badge-${user?.role}`}>
+                    {user?.role}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {isAdmin && (
+              <div
+                className="card"
+                style={{ borderColor: "rgba(240,96,96,0.2)" }}
+              >
+                <div className="card-title" style={{ color: "var(--red)" }}>
+                  Danger Zone
+                </div>
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: "var(--text2)",
+                    marginBottom: 16,
+                    lineHeight: 1.7,
+                  }}
+                >
+                  Permanently delete your organization. This will remove all
+                  applications, environments, API keys, and users. This action
+                  is irreversible.
+                </div>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => setConfirmDelete(true)}
+                >
+                  {Icon.trash} Delete Organization
+                </button>
+              </div>
+            )}
+
+            {confirmDelete && (
+              <Modal
+                title="Delete Organization"
+                sub="This will permanently delete everything. Enter your Organization ID to confirm."
+                onClose={() => setConfirmDelete(false)}
+              >
+                <div className="warn-box">
+                  ⚠ This action is permanent and cannot be reversed.
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Organization ID</label>
+                  <input
+                    className="form-input danger-input"
+                    value={orgId}
+                    onChange={(e) => setOrgId(e.target.value)}
+                    placeholder="Enter organization ID..."
+                  />
+                </div>
+                <div className="modal-actions">
+                  <button
+                    className="btn btn-ghost"
+                    onClick={() => setConfirmDelete(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={deleteOrg}
+                    disabled={!orgId || deleting}
+                  >
+                    {deleting ? <span className="spinner" /> : null} Delete
+                    Forever
+                  </button>
+                </div>
+              </Modal>
+            )}
+          </div>
+        );
+      }
+
+      // ─── Sidebar ──────────────────────────────────────────────────────────────────
+      function Sidebar({ path, navigate, user, logout }) {
+        const items = [
+          {
+            href: "/dashboard",
+            label: "Dashboard",
+            icon: Icon.dashboard,
+            section: "OVERVIEW",
+          },
+          {
+            href: "/applications",
+            label: "Applications",
+            icon: Icon.apps,
+            section: null,
+          },
+          {
+            href: "/apikeys",
+            label: "API Keys",
+            icon: Icon.keys,
+            section: "MANAGE",
+          },
+          {
+            href: "/users",
+            label: "Users",
+            icon: Icon.users,
+            section: null,
+            adminOnly: true,
+          },
+          { href: "/logs", label: "Logs", icon: Icon.logs, section: "OBSERVE" },
+          {
+            href: "/settings",
+            label: "Settings",
+            icon: Icon.settings,
+            section: "SYSTEM",
+          },
+        ];
+
+        let lastSection = null;
+        return (
+          <div className="sidebar">
+            <div className="sidebar-logo">
+              <div className="logo-mark">Logical Plane</div>
+              <div className="logo-sub">Control Center</div>
+            </div>
+            <div className="sidebar-nav">
+              {items.map((item) => {
+                if (item.adminOnly && user?.role !== "admin") return null;
+                const els = [];
+                if (item.section && item.section !== lastSection) {
+                  lastSection = item.section;
+                  els.push(
+                    <div key={"sec-" + item.section} className="nav-section">
+                      {item.section}
+                    </div>,
+                  );
+                }
+                els.push(
+                  <button
+                    key={item.href}
+                    className={`nav-item ${path === item.href ? "active" : ""}`}
+                    onClick={() => navigate(item.href)}
+                  >
+                    {item.icon} {item.label}
+                  </button>,
+                );
+                return els;
+              })}
+            </div>
+            <div className="sidebar-footer">
+              <div className="org-badge" style={{ marginBottom: 8 }}>
+                <div className="org-name">{user?.username || "—"}</div>
+                <div className="org-role">{user?.role}</div>
+              </div>
+              <button
+                className="nav-item"
+                onClick={logout}
+                style={{ width: "100%", color: "var(--red)", opacity: 0.8 }}
+              >
+                {Icon.logout} Sign Out
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      // ─── App Shell ────────────────────────────────────────────────────────────────
+      function AppShell({ path, navigate, user, logout }) {
+        const titles = {
+          "/dashboard": "Dashboard",
+          "/applications": "Applications",
+          "/apikeys": "API Keys",
+          "/users": "Users",
+          "/logs": "Logs",
+          "/settings": "Settings",
+        };
+
+        let Page = DashboardPage;
+        if (path === "/applications") Page = ApplicationsPage;
+        else if (path === "/apikeys") Page = ApiKeysPage;
+        else if (path === "/users") Page = UsersPage;
+        else if (path === "/logs") Page = LogsPage;
+        else if (path === "/settings") Page = SettingsPage;
+
+        return (
+          <div className="app-shell">
+            <Sidebar
+              path={path}
+              navigate={navigate}
+              user={user}
+              logout={logout}
+            />
+            <div className="main">
+              <div className="topbar">
+                <div className="topbar-title">
+                  {titles[path] || "Logical Plane"}
+                </div>
+              </div>
+              <div className="page-content">
+                <Page key={path} />
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // ─── Root ─────────────────────────────────────────────────────────────────────
+      function Root() {
+        const { path, navigate } = useRoute();
+        const [user, setUser] = useState(() => {
+          const saved = localStorage.getItem("lp_user");
+          return saved ? JSON.parse(saved) : null;
+        });
+
+        function logout() {
+          localStorage.removeItem("lp_user");
+          setUser(null);
+          navigate("/login");
+        }
+
+        const authValue = { user, setUser, logout };
+
+        // Route logic
+        const authed = !!user;
+        const isAuth = path === "/login" || path === "/register";
+
+        if (!authed && !isAuth) {
+          navigate("/login");
+          return null;
+        }
+        if (authed && isAuth) {
+          navigate("/dashboard");
+          return null;
+        }
+
+        return (
+          <AuthCtx.Provider value={authValue}>
+            <ToastProvider>
+              {!authed ? (
+                path === "/register" ? (
+                  <RegisterPage navigate={navigate} />
+                ) : (
+                  <LoginPage navigate={navigate} setUser={setUser} />
+                )
+              ) : (
+                <AppShell
+                  path={path}
+                  navigate={navigate}
+                  user={user}
+                  logout={logout}
+                />
+              )}
+            </ToastProvider>
+          </AuthCtx.Provider>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<Root />);
+    </script>
+  </body>
+</html>
