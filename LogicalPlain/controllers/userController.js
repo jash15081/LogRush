@@ -63,6 +63,78 @@ export async function userLogin(req, res) {
   });
 }
 
+export async function userLogout(req, res) {
+  res.clearCookie("auth_token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+  });
+  return res.status(200).json({ message: "Logged out" });
+}
+
+export async function getCurrentUser(req, res) {
+  return res.json({
+    user: req.user,
+  });
+}
+
+export async function listUsers(req, res) {
+  const { organizationId } = req.user;
+  try {
+    const result = await pool.query(
+      `
+      SELECT id, username, role, created_at, last_login_at
+      FROM users
+      WHERE organization_id = $1
+      ORDER BY created_at DESC
+      `,
+      [organizationId],
+    );
+    return res.status(200).json({
+      users: result.rows,
+    });
+  } catch (err) {
+    console.error("List users error:", err);
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+}
+
+export async function updateUser(req, res) {
+  const { userId, username, role } = req.body;
+  const { organizationId } = req.user;
+
+  if (!userId) {
+    return res.status(400).json({ error: "userId is required" });
+  }
+
+  try {
+    const result = await pool.query(
+      `
+      UPDATE users
+      SET username = COALESCE($1, username), role = COALESCE($2, role)
+      WHERE id = $3 AND organization_id = $4
+      RETURNING id, username, role, created_at
+      `,
+      [username, role, userId, organizationId],
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    return res.status(200).json({
+      message: "User updated successfully",
+      user: result.rows[0],
+    });
+  } catch (err) {
+    console.error("Update user error:", err);
+    if (err.code === "23505") {
+      return res.status(409).json({ error: "Username already exists" });
+    }
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
 export async function createUser(req, res) {
   const { username, password, role } = req.body;
   const { organizationId } = req.user;

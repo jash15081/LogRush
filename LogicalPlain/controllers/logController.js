@@ -1,5 +1,16 @@
 import opensearchClient from "../config/opensearch.js";
 
+function normalizeDateTimeParam(value) {
+  if (!value) return undefined;
+  // If frontend sends `datetime-local` (e.g. 2026-03-25T13:45), convert to ISO.
+  // If it already includes timezone (Z or ±hh:mm), keep it as-is.
+  const hasTimezone = /[zZ]|[+-]\d{2}:\d{2}$/.test(value);
+  if (hasTimezone) return value;
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return value; // let OpenSearch handle/err
+  return d.toISOString();
+}
+
 export async function queryLogs(req, res) {
   const organizationId = req.user?.organizationId;
 
@@ -23,33 +34,65 @@ export async function queryLogs(req, res) {
   const must = [{ term: { organization_id: organizationId } }];
 
   if (level) {
-    must.push({ term: { level } });
+    // Stored levels are uppercase (e.g. INFO/WARN/ERROR)
+    const normalizedLevel = String(level).trim().toUpperCase();
+    must.push({
+      bool: {
+        should: [
+          { term: { "level.keyword": { value: normalizedLevel, case_insensitive: true } } },
+          { term: { level: { value: normalizedLevel, case_insensitive: true } } },
+          { match_phrase: { level: normalizedLevel } },
+        ],
+        minimum_should_match: 1,
+      },
+    });
   }
 
   if (application) {
-    must.push({ match_phrase: { application } });
+    const v = String(application).trim();
+    must.push({
+      bool: {
+        should: [
+          { term: { "application.keyword": { value: v, case_insensitive: true } } },
+          { term: { application: { value: v, case_insensitive: true } } },
+          { match_phrase: { application: v } },
+        ],
+        minimum_should_match: 1,
+      },
+    });
   }
 
   if (environment) {
-    must.push({ match_phrase: { environment } });
+    const v = String(environment).trim();
+    must.push({
+      bool: {
+        should: [
+          { term: { "environment.keyword": { value: v, case_insensitive: true } } },
+          { term: { environment: { value: v, case_insensitive: true } } },
+          { match_phrase: { environment: v } },
+        ],
+        minimum_should_match: 1,
+      },
+    });
   }
 
   if (q) {
     must.push({
-      query_string: {
+      simple_query_string: {
         query: q,
-        fields: ["message", "metadata.*", "application", "environment"],
-        default_operator: "AND",
+        fields: ["message", "application", "environment", "metadata.*"],
+        default_operator: "and",
+        lenient: true,
       },
     });
   }
 
   const range = {};
   if (startTime) {
-    range.gte = startTime;
+    range.gte = normalizeDateTimeParam(startTime);
   }
   if (endTime) {
-    range.lte = endTime;
+    range.lte = normalizeDateTimeParam(endTime);
   }
 
   if (Object.keys(range).length > 0) {
