@@ -20,8 +20,8 @@ router.post("/ingest", async (req, res) => {
       console.warn(`[AUTH] Missing or malformed Authorization header`);
       return res.status(401).json({ error: "Missing API key" });
     }
-
     const rawKey = auth.split(" ")[1];
+    console.log(rawKey);
     const apiKeyHash = hashApiKey(rawKey);
 
     console.log(`[AUTH] Verifying API key...`);

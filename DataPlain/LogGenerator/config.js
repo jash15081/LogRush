@@ -26,31 +26,31 @@ export const TRAFFIC_CONFIG = {
  */
 export const ORGANIZATIONS = [
   {
-    name: "Simform",
+    name: "TechCorp",
     apiKeys: [
       {
-        key: "lk_7436843325a4ecfe9eae4ba0bb5c7cb38554381f004fe2ce2e68453c0cedfe46",
+        key: "lk_f94ef8de3b105f04c8518104ebf56fb839139774c589b1fde9b1d6ac029afe8b",
         rps: 200,
       },
-      {
-        key: "lk_35780e69f262fd667b10da3aad014312e4c5745445a8a9d0c56f8c6bb9591e8f",
-        rps: 100,
-      },
+      // {
+      //   key: "lk_35780e69f262fd667b10da3aad014312e4c5745445a8a9d0c56f8c6bb9591e8f",
+      //   rps: 100,
+      // },
     ],
-    applications: ["Hotel Management", "School Management"],
-    environments: ["dev", "test"],
-  },
-  {
-    name: "SDNA",
-    apiKeys: [
-      {
-        key: "lk_62b839fffeec14099e862b08eacda9c6d0626937e692eddb312f6f6e7f2ab9d5",
-        rps: 40,
-      },
-    ],
-    applications: ["recommendation-service"],
+    applications: ["web-app"],
     environments: ["dev"],
   },
+  // {
+  //   name: "SDNA",
+  //   apiKeys: [
+  //     {
+  //       key: "lk_62b839fffeec14099e862b08eacda9c6d0626937e692eddb312f6f6e7f2ab9d5",
+  //       rps: 40,
+  //     },
+  //   ],
+  //   applications: ["recommendation-service"],
+  //   environments: ["dev"],
+  // },
 ];
 
 /**

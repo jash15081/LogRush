@@ -1,0 +1,37 @@
+[
+  {
+    "name": "simform-test-2",
+    "org_id": "13488a79-af13-4702-9e22-7ee70ab7b279",
+    "apiKey": "1a92c99b50b6015e90987f30bda616e3f1ed336885f0b792a89731a2ec62d9ce",
+    "applications": ["auth-service", "payment-service"],
+    "environments": ["production", "staging"]
+  },
+  {
+    "name": "simform-test-1",
+    "org_id": "13488a79-af13-4702-9e22-7ee70ab7b279",
+    "apiKey": "36eabcc8a0e7c5d4118266e1e6c82a197b07cc6c385ea0f23a0f577dc8aeb1b0",
+    "applications": ["auth-service", "payment-service"],
+    "environments": ["production", "staging"]
+  },
+  {
+    "name": "test-1",
+    "org_id": "7dbf5fd4-a75a-471b-980a-4e47a7b32bfc",
+    "apiKey": "10b75526d722a5d0fcf125a30fa200f50d6885fc0291f021ce377a048b9427dc",
+    "applications": ["auth-service", "payment-service"],
+    "environments": ["production", "staging"]
+  },
+  {
+    "name": "sdna-test-1",
+    "org_id": "7dbf5fd4-a75a-471b-980a-4e47a7b32bfc",
+    "apiKey": "ed2c45d00ea8833639f720b958736e46cb9e60c8542372f0bc23fb1e7a5d9b5c",
+    "applications": ["auth-service", "payment-service"],
+    "environments": ["production", "staging"]
+  },
+  {
+    "name": "sdna-test-1",
+    "org_id": "7dbf5fd4-a75a-471b-980a-4e47a7b32bfc",
+    "apiKey": "7e7818a57bd4ffb5d33e26af1bad4fb191d6eb28643f32426be4660b00c0577a",
+    "applications": ["auth-service", "payment-service"],
+    "environments": ["production", "staging"]
+  }
+]

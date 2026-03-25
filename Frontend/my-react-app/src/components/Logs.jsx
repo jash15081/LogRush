@@ -1,6 +1,34 @@
 import { useState, useEffect } from "react";
 import { api } from "../lib/api";
 
+// Highlights all occurrences of `term` inside `text`
+const Highlight = ({ text, term }) => {
+  if (!term || !text) return <>{text}</>;
+
+  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const regex = new RegExp(`(${escaped})`, "gi");
+  const parts = String(text).split(regex);
+
+  return (
+    <>
+      {parts.map((part, i) =>
+        regex.test(part) ? (
+          <mark key={i} style={{
+            backgroundColor: "var(--highlight, #facc15)",
+            color: "inherit",
+            borderRadius: "2px",
+            padding: "0 2px",
+          }}>
+            {part}
+          </mark>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  );
+};
+
 const Logs = () => {
   const [logs, setLogs] = useState([]);
   const [filters, setFilters] = useState({
@@ -15,6 +43,7 @@ const Logs = () => {
   });
   const [total, setTotal] = useState(0);
   const [error, setError] = useState("");
+  const [appliedQ, setAppliedQ] = useState(""); // tracks what was actually searched
 
   useEffect(() => {
     let cancelled = false;
@@ -28,14 +57,13 @@ const Logs = () => {
         if (cancelled) return;
         setLogs(response.data.logs);
         setTotal(response.data.total);
+        setAppliedQ(filters.q); // sync highlight term with what was fetched
         setError("");
       } catch {
         if (!cancelled) setError("Failed to fetch logs");
       }
     })();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [filters]);
 
   const handleFilterChange = (e) => {
@@ -157,7 +185,9 @@ const Logs = () => {
               {logs.map((log) => (
                 <tr key={log.id}>
                   <td>{log.level}</td>
-                  <td style={{ fontFamily: "var(--mono)" }}>{log.message}</td>
+                  <td style={{ fontFamily: "var(--mono)" }}>
+                    <Highlight text={log.message} term={appliedQ} />
+                  </td>
                   <td>{log.application}</td>
                   <td>{log.environment}</td>
                   <td style={{ color: "var(--muted)" }}>{log["@timestamp"]}</td>

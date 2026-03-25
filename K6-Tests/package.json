@@ -1,0 +1,33 @@
+{
+  "name": "logrush-k6-tests",
+  "version": "1.0.0",
+  "description": "K6 performance + security tests for LogRush ingestion service",
+  "type": "module",
+  "main": "run_tests.js",
+  "engines": {
+    "node": ">=14"
+  },
+  "scripts": {
+    "fetch-orgs": "node scripts/fetch_orgs.js",
+    "generate-test-data": "node generate-test-data.js",
+    "setup-test-data": "npm run generate-test-data && move test-data.json tests/",
+    "k6:smoke": "k6 run tests/1_smoke_test.js",
+    "k6:invalid-key": "k6 run tests/2_invalid_key_test.js",
+    "k6:scale": "k6 run tests/3_scale_demo_test.js",
+    "k6:data": "k6 run tests/4_data_driven_test.js",
+    "k6:all": "npm run setup-test-data && npm run k6:smoke && npm run k6:invalid-key && npm run k6:scale && npm run k6:data",
+    "test": "npm run k6:all"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "node-fetch": "^3.3.2",
+    "pg": "^8.0.0"
+  },
+  "keywords": [
+    "k6",
+    "load-testing",
+    "postgres",
+    "logrush"
+  ],
+  "license": "MIT"
+}

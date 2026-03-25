@@ -28,11 +28,11 @@ export async function queryLogs(req, res) {
     page = 1,
     perPage = 50,
   } = req.query;
-
+  console.log(req.query)
   const index = process.env.OPENSEARCH_INDEX_PATTERN || "logs-*";
 
   const must = [{ term: { organization_id: organizationId } }];
-
+ 
   if (level) {
     // Stored levels are uppercase (e.g. INFO/WARN/ERROR)
     const normalizedLevel = String(level).trim().toUpperCase();
@@ -77,12 +77,34 @@ export async function queryLogs(req, res) {
   }
 
   if (q) {
+    const trimmed = String(q).trim();
     must.push({
-      simple_query_string: {
-        query: q,
-        fields: ["message", "application", "environment", "metadata.*"],
-        default_operator: "and",
-        lenient: true,
+      bool: {
+        should: [
+          // Full-text search on message (text field)
+          {
+            match: {
+              message: {
+                query: trimmed,
+                operator: "or",
+                fuzziness: "AUTO",
+              },
+            },
+          },
+          // Wildcard on message for partial/single-char matches
+          {
+            wildcard: {
+              message: {
+                value: `*${trimmed.toLowerCase()}*`,
+                case_insensitive: true,
+              },
+            },
+          },
+          // keyword fields need term/wildcard, NOT full-text queries
+         
+         
+        ],
+        minimum_should_match: 1,
       },
     });
   }
@@ -122,12 +144,12 @@ export async function queryLogs(req, res) {
         size,
       },
     });
-
+    console.log("Q VALUE:", JSON.stringify(q));
+  console.log("MUST ARRAY:", JSON.stringify(must, null, 2));
     const hits = response.body.hits?.hits || [];
     const total = response.body.hits?.total?.value ?? 0;
 
     const logs = hits.map((hit) => ({ id: hit._id, ...hit._source }));
-
     return res.status(200).json({
       total,
       page: pageNum,

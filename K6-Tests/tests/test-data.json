@@ -1,0 +1,295 @@
+{
+  "organizations": [
+    {
+      "id": "39d36c6e-11ca-40a7-9db2-0c423e9a39d1",
+      "name": "TechCorp",
+      "created_at": "2026-03-25T19:23:02.717Z",
+      "adminUsername": "admin_techcorp",
+      "adminPassword": "TechCorp123!",
+      "applications": [
+        {
+          "id": "88b61629-b29d-490d-a52d-0cae405aa9e4",
+          "name": "web-app",
+          "description": "web-app application",
+          "created_at": "2026-03-25T19:23:03.243Z"
+        },
+        {
+          "id": "0d1eebe7-f300-40ed-a81d-c1ead630c4cd",
+          "name": "mobile-app",
+          "description": "mobile-app application",
+          "created_at": "2026-03-25T19:23:03.252Z"
+        },
+        {
+          "id": "83e4b3f5-dcaf-4a13-9d7c-177972dbf42a",
+          "name": "api-gateway",
+          "description": "api-gateway application",
+          "created_at": "2026-03-25T19:23:03.256Z"
+        }
+      ],
+      "environments": [
+        "development",
+        "staging",
+        "production"
+      ],
+      "apiKeys": [
+        {
+          "id": "42697cc5-519e-4597-af13-98fe3a41b7da",
+          "name": "dev-key",
+          "rawKey": "lk_f94ef8de3b105f04c8518104ebf56fb839139774c589b1fde9b1d6ac029afe8b",
+          "rateLimitPerSec": 100,
+          "createdAt": "2026-03-25T19:23:03.261Z",
+          "expiresAt": null
+        },
+        {
+          "id": "5b12eb71-c7c4-4833-807f-1527ae13c182",
+          "name": "staging-key",
+          "rawKey": "lk_b9b523da47d19c02ffef1998a309d6a667e052d3a3879e73f24073909d0604e6",
+          "rateLimitPerSec": 500,
+          "createdAt": "2026-03-25T19:23:03.266Z",
+          "expiresAt": null
+        },
+        {
+          "id": "2b3aaf72-9c23-4f5a-ac3f-932a06e44781",
+          "name": "prod-key",
+          "rawKey": "lk_0929f666ea7519e41d1b14e93fa942dc998fdf2cb20472041cc106bc3dc71676",
+          "rateLimitPerSec": 1000,
+          "createdAt": "2026-03-25T19:23:03.270Z",
+          "expiresAt": null
+        }
+      ]
+    },
+    {
+      "id": "4787e849-5512-4781-a87f-6e6e8ef5ca8a",
+      "name": "DataFlow Inc",
+      "created_at": "2026-03-25T19:23:03.274Z",
+      "adminUsername": "admin_dataflow",
+      "adminPassword": "DataFlow456!",
+      "applications": [
+        {
+          "id": "c3347227-9020-4047-b0f2-786d2cfe62c2",
+          "name": "analytics-engine",
+          "description": "analytics-engine application",
+          "created_at": "2026-03-25T19:23:03.738Z"
+        },
+        {
+          "id": "7553bfa7-7663-4bd3-9310-6f660ed7067c",
+          "name": "data-pipeline",
+          "description": "data-pipeline application",
+          "created_at": "2026-03-25T19:23:03.754Z"
+        },
+        {
+          "id": "1bd2b2a7-a1fa-45ea-b583-bcf5ac52ab04",
+          "name": "dashboard",
+          "description": "dashboard application",
+          "created_at": "2026-03-25T19:23:03.757Z"
+        }
+      ],
+      "environments": [
+        "dev",
+        "test",
+        "prod"
+      ],
+      "apiKeys": [
+        {
+          "id": "c4333e00-aa24-46a8-bd41-f40c690b07fa",
+          "name": "analytics-key",
+          "rawKey": "lk_735af103ddf1f6696d40643129f9f4031f5f8a5e7b4968c1d4e8978a1d6ffc3a",
+          "rateLimitPerSec": 200,
+          "createdAt": "2026-03-25T19:23:03.760Z",
+          "expiresAt": null
+        },
+        {
+          "id": "a660ae77-fb6b-4872-a94c-1fb604008721",
+          "name": "pipeline-key",
+          "rawKey": "lk_46ecf513c87d4743832ca81b180f678f84b739526b197618565848f9d3a744db",
+          "rateLimitPerSec": 300,
+          "createdAt": "2026-03-25T19:23:03.764Z",
+          "expiresAt": null
+        },
+        {
+          "id": "b458e82e-a754-40d3-91a1-8df2129d5aab",
+          "name": "dashboard-key",
+          "rawKey": "lk_8fa9799d81b7194164e1097fb8970061f3133487619eb757a9f7dd0caa43cdae",
+          "rateLimitPerSec": 150,
+          "createdAt": "2026-03-25T19:23:03.767Z",
+          "expiresAt": null
+        }
+      ]
+    },
+    {
+      "id": "3e03c44f-8adf-402d-8a6c-e07b2f939c00",
+      "name": "CloudSync",
+      "created_at": "2026-03-25T19:23:03.769Z",
+      "adminUsername": "admin_cloudsync",
+      "adminPassword": "CloudSync789!",
+      "applications": [
+        {
+          "id": "dfc04487-5b8b-42e8-83eb-acb0835e01a6",
+          "name": "sync-service",
+          "description": "sync-service application",
+          "created_at": "2026-03-25T19:23:04.229Z"
+        },
+        {
+          "id": "7e50e516-b58b-4c07-b38d-816afd98577c",
+          "name": "backup-agent",
+          "description": "backup-agent application",
+          "created_at": "2026-03-25T19:23:04.243Z"
+        },
+        {
+          "id": "3fcc9a73-6adc-410e-b2f1-5f1508335f28",
+          "name": "monitoring",
+          "description": "monitoring application",
+          "created_at": "2026-03-25T19:23:04.245Z"
+        }
+      ],
+      "environments": [
+        "development",
+        "staging",
+        "production"
+      ],
+      "apiKeys": [
+        {
+          "id": "f4b16aa6-8a41-49c1-9aa4-51e12840ae22",
+          "name": "sync-key",
+          "rawKey": "lk_5047c2f1bdcc0a4c96b5824325561df4bf2488faecbf7edbdbb2267290de7430",
+          "rateLimitPerSec": 250,
+          "createdAt": "2026-03-25T19:23:04.249Z",
+          "expiresAt": null
+        },
+        {
+          "id": "5a748545-24b9-434b-9827-d420347588dd",
+          "name": "backup-key",
+          "rawKey": "lk_c22f6feac51c2c8d993af98a212b6a04635164f28ddab679befcf7d2d90773c5",
+          "rateLimitPerSec": 100,
+          "createdAt": "2026-03-25T19:23:04.251Z",
+          "expiresAt": null
+        },
+        {
+          "id": "177749cc-97f9-49ac-a9dc-171375dc29ed",
+          "name": "monitor-key",
+          "rawKey": "lk_3665972b291029439a514a00f4d3805dd04110f11a778be1deefbc32b346227d",
+          "rateLimitPerSec": 50,
+          "createdAt": "2026-03-25T19:23:04.254Z",
+          "expiresAt": null
+        }
+      ]
+    },
+    {
+      "id": "3ad04290-16f6-4bc1-ba9a-973a1e3045f0",
+      "name": "LogAnalyzer Pro",
+      "created_at": "2026-03-25T19:23:04.256Z",
+      "adminUsername": "admin_loganalyzer",
+      "adminPassword": "LogAnalyzer101!",
+      "applications": [
+        {
+          "id": "f35e3748-192a-416c-be9a-3a4d0fd83770",
+          "name": "log-processor",
+          "description": "log-processor application",
+          "created_at": "2026-03-25T19:23:04.710Z"
+        },
+        {
+          "id": "8ed3892a-9ada-43f0-a490-b99de930b7d0",
+          "name": "alert-system",
+          "description": "alert-system application",
+          "created_at": "2026-03-25T19:23:04.725Z"
+        },
+        {
+          "id": "e8a471f6-3045-4ee3-a6ae-6c077ebdd2f7",
+          "name": "reporting",
+          "description": "reporting application",
+          "created_at": "2026-03-25T19:23:04.728Z"
+        }
+      ],
+      "environments": [
+        "dev",
+        "staging",
+        "prod"
+      ],
+      "apiKeys": [
+        {
+          "id": "ff0f8f52-4460-49e9-9f32-e90c65e94804",
+          "name": "processor-key",
+          "rawKey": "lk_f421d24fd3a2d7bb4e2597eeea7944ef881d3b07344726e572158ec35e4bfc35",
+          "rateLimitPerSec": 300,
+          "createdAt": "2026-03-25T19:23:04.732Z",
+          "expiresAt": null
+        },
+        {
+          "id": "b3e4f2d7-8e2e-4bd6-ad8c-4a7914ad823b",
+          "name": "alert-key",
+          "rawKey": "lk_e883b99f27a7ed4bae80be83e312c1191bfb31f5cb4517f0e3651b59c29849e5",
+          "rateLimitPerSec": 100,
+          "createdAt": "2026-03-25T19:23:04.735Z",
+          "expiresAt": null
+        },
+        {
+          "id": "52ac373b-a29f-4057-861f-659c3b0e817a",
+          "name": "report-key",
+          "rawKey": "lk_89163e3cd631a1669000ed8a688a3576c746b6a3c85c9707bcfdea478a9ca220",
+          "rateLimitPerSec": 200,
+          "createdAt": "2026-03-25T19:23:04.738Z",
+          "expiresAt": null
+        }
+      ]
+    },
+    {
+      "id": "b6a38ba3-86e9-433c-b773-0991e7d9a1bb",
+      "name": "DevOps Central",
+      "created_at": "2026-03-25T19:23:04.741Z",
+      "adminUsername": "admin_devopscentral",
+      "adminPassword": "DevOps2024!",
+      "applications": [
+        {
+          "id": "d9adaeb6-bf23-4ea9-a9a7-c11e11cf02a3",
+          "name": "ci-cd",
+          "description": "ci-cd application",
+          "created_at": "2026-03-25T19:23:05.202Z"
+        },
+        {
+          "id": "e2d86bb7-ad12-4355-bb6b-196d1242b7da",
+          "name": "monitoring",
+          "description": "monitoring application",
+          "created_at": "2026-03-25T19:23:05.206Z"
+        },
+        {
+          "id": "1bb75549-ce25-4ca5-b97a-96c28b33cc97",
+          "name": "deployment",
+          "description": "deployment application",
+          "created_at": "2026-03-25T19:23:05.209Z"
+        }
+      ],
+      "environments": [
+        "development",
+        "staging",
+        "production"
+      ],
+      "apiKeys": [
+        {
+          "id": "d209c666-4e66-4526-ab63-7c3016bef947",
+          "name": "ci-key",
+          "rawKey": "lk_2cc2ea21546eadae555af34c26ff93284adbad7579124806566216e4168e3a1a",
+          "rateLimitPerSec": 400,
+          "createdAt": "2026-03-25T19:23:05.211Z",
+          "expiresAt": null
+        },
+        {
+          "id": "2919bd5f-2531-4f8a-a7f1-4bf860a6e4fe",
+          "name": "monitor-key",
+          "rawKey": "lk_20876b230a278a1a4dec5364b524497e16a0be1396c54d843416769fc64903fb",
+          "rateLimitPerSec": 150,
+          "createdAt": "2026-03-25T19:23:05.214Z",
+          "expiresAt": null
+        },
+        {
+          "id": "37ec5f26-0f8d-4aba-a9d1-46adf30c927f",
+          "name": "deploy-key",
+          "rawKey": "lk_b321cd907bcc1a63eed37d24eff53ccb77838033ad473f78450a68bd2ee7908f",
+          "rateLimitPerSec": 250,
+          "createdAt": "2026-03-25T19:23:05.217Z",
+          "expiresAt": null
+        }
+      ]
+    }
+  ],
+  "generatedAt": "2026-03-25T19:23:02.617Z"
+}

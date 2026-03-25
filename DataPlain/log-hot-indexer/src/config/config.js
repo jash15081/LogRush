@@ -2,7 +2,7 @@ export default {
   kafka: {
     clientId: "log-hot-indexer",
     brokers: ["redpanda:29092"],
-    groupId: "log-hot-indexer",
+    groupId: "log-hot-indexer-v2", // Changed group ID to force fresh assignment
   },
   opensearch: {
     node: "http://opensearch:9200",
