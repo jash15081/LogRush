@@ -76,13 +76,13 @@ export default function () {
     },
   });
 
-  const success = res.status === 200;
+  const success = res.status === 202;
   ingestDuration.add(res.timings.duration);
   successRate.add(success);
   totalLogs.add(BATCH_SIZE);
 
   check(res, {
-    "status 200": (r) => r.status === 200,
+    "status 202": (r) => r.status === 202,
     "response < 1.5s": (r) => r.timings.duration < 1500,
   });
 

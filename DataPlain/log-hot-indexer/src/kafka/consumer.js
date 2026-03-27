@@ -24,7 +24,7 @@ async function flush() {
 export async function startConsumer() {
   await consumer.connect();
   await consumer.subscribe({
-    topic: "logs.raw",
+    topics: ["logs.raw"],
     fromBeginning: true,
   });
 
