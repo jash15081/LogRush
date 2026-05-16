@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>K6 Load Test Graphs</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: sans-serif; margin: 20px; background-color: #f5f5f5; }
+    .chart-container { width: 80%; max-width: 1000px; margin: 20px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    h1 { text-align: center; }
+  </style>
+</head>
+<body>
+  <h1>K6 Load Test Results</h1>
+  
+  <div class="chart-container">
+    <canvas id="timeSeriesChart"></canvas>
+  </div>
+  
+  <div class="chart-container">
+    <canvas id="latencyChart"></canvas>
+  </div>
+
+  <script>
+    const labels = ["0s","1s","2s","3s","4s","5s","6s","7s","8s","9s","10s","11s","12s","13s","14s","15s","16s","17s","18s","19s","20s","21s","22s","23s","24s","25s","26s","27s","28s","29s","30s","31s","32s","33s","34s","35s","36s","37s","38s","39s","40s","41s","42s","43s","44s","45s","46s","47s","48s","49s","50s","51s","52s","53s","54s","55s","56s","57s","58s","59s","60s","61s","62s","63s","64s","65s","66s","67s","68s","69s","70s"];
+    const vusData = [0,1,1,2,2,3,3,4,4,5,5,5,6,6,7,7,8,8,9,9,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39,41,43,45,47,49,52,54,57,59,62,64,67,69,72,74,77,79,82,84,87,89,92,94,97,99,93,82,72,61,52,41,32,22,11,1];
+    const reqsData = [14,18,30,34,44,54,54,72,71,87,89,106,109,115,122,133,123,134,160,162,167,211,256,293,327,361,317,360,355,359,375,322,355,368,353,413,485,489,568,396,432,493,588,457,401,334,325,318,323,332,349,345,350,346,365,288,258,276,316,235,262,283,267,328,385,319,335,225,249,95,3];
+    
+    const ctx1 = document.getElementById('timeSeriesChart').getContext('2d');
+    new Chart(ctx1, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Throughput (reqs/s)',
+            data: reqsData,
+            borderColor: 'blue',
+            backgroundColor: 'rgba(0, 0, 255, 0.1)',
+            yAxisID: 'y',
+            tension: 0.2,
+            fill: true
+          },
+          {
+            label: 'Virtual Users (VUs)',
+            data: vusData,
+            borderColor: 'green',
+            backgroundColor: 'transparent',
+            yAxisID: 'y1',
+            tension: 0.2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: { display: true, text: 'VUs vs Throughput' }
+        },
+        scales: {
+          y: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            title: { display: true, text: 'Reqs/s' }
+          },
+          y1: {
+            type: 'linear',
+            display: true,
+            position: 'right',
+            grid: { drawOnChartArea: false },
+            title: { display: true, text: 'VUs' }
+          }
+        }
+      }
+    });
+
+    const latencyData = {"labels":["Avg","Med","p(90)","p(95)","Max"],"values":[93.10172573227389,50.0968,205.76963999999992,292.05454,497.5776]};
+    const ctx2 = document.getElementById('latencyChart').getContext('2d');
+    new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: latencyData.labels,
+        datasets: [{
+          label: 'Latency (ms)',
+          data: latencyData.values,
+          backgroundColor: ['#4bc0c0', '#36a2eb', '#ffce56', '#ff9f40', '#ff6384']
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: { display: true, text: 'Latency Percentiles' }
+        },
+        scales: {
+          y: { beginAtZero: true, title: { display: true, text: 'Milliseconds' } }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
+  
